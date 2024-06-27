@@ -40,5 +40,5 @@ services:
     depends_on:
       - db
     environment:
-      DATABASE_URL: {DB_TYPE}://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=${DB_SSL_MODE}
+      DATABASE_URL: ${DB_TYPE}://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=${DB_SSL_MODE}
       SERVER_ADDRESS: ${SERVER_ADDRESS}
