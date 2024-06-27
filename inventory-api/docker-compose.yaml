@@ -12,6 +12,10 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "${DB_PORT}:5432"
+    healthcheck:
+      test: ['CMD', "pg_isready -h localhost"]
+      timeout: 10s
+      retries: 5
   migrate:
     image: migrate/migrate
     volumes:
