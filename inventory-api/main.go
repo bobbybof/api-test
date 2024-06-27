@@ -12,19 +12,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type Config struct {
-	DbSource      string `env:"DB_SOURCE"`
-	DbType        string `env:"DB_TYPE"`
-	DbUsername    string `env:"DB_USERNAME"`
-	DbPassword    string `env:"DB_PASSWORD"`
-	DbName        string `env:"DB_NAME"`
-	DbTestName    string `env:"DB_TEST_NAME"`
-	DbHost        string `env:"DB_HOST" env-default:"localhost"`
-	DbPort        string `env:"DB_PORT" env-default:"5432"`
-	DbSSLMode     string `env:"DB_SSL_MODE" env-default:"false"`
-	ServerAddress string `env:"SERVER_ADDRESS" env-default:"0.0.0.0:8888"`
-}
-
 func main() {
 	config, err := config.NewConfig(".env")
 
@@ -41,21 +28,20 @@ func main() {
 		config.DbSSLMode,
 	)
 
-	// dbConn, err := sql.Open(config.DbType, dbSource)
-
 	poolConfig, err := pgxpool.ParseConfig(dbSource)
+
+	if err != nil {
+		log.Fatal("Faild parse config", err)
+	}
 
 	poolConfig.MaxConnLifetime = 100
 
 	dbConn, err := pgxpool.NewWithConfig(context.Background(), poolConfig)
 
 	if err != nil {
-		log.Fatal("cannot connect to db:", err)
-	}
-
-	if err != nil {
 		log.Fatal("Failed to open connection to database", err)
 	}
+
 	err = dbConn.Ping(context.Background())
 	if err != nil {
 		log.Fatal("Failed to ping database ", err)

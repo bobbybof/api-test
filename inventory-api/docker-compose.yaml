@@ -4,8 +4,10 @@ services:
   db:
     image: postgres:latest
     restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     env_file:
-      - ./.env
+      - .env
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USERNAME}
@@ -13,8 +15,9 @@ services:
     ports:
       - "${DB_PORT}:5432"
     healthcheck:
-      test: ['CMD', "pg_isready -h localhost"]
-      timeout: 10s
+      test: ['CMD', 'pg_isready', '-U', '${DB_USERNAME}']
+      interval: 10s
+      timeout: 3s
       retries: 5
   migrate:
     image: migrate/migrate
@@ -23,27 +26,31 @@ services:
     links:
       - db
     depends_on:
-      db: 
-        condition: service_healthy
+      - db
     env_file:
-      - ./.env
-    command:
+      - .env
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    command: 
       [
-        '-path',
-        'db/migrations',
-        '-database',
-        '${DB_TYPE}://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable',
-        '-verbose',
-        'up',
+        "-path",
+        "/migrations",
+        "-database",
+        "postgres://${DB_USERNAME}:${DB_PASSWORD}@db:5432/${DB_NAME}?sslmode=disable",
+        "up",
       ]
+    restart: on-failure
   server:
     build: .
-    restart: always
-    ports:
-      - "8888:8888"
+    env_file:
+      - .env
     depends_on:
       db:
         condition: service_healthy
-    environment:
-      DATABASE_URL: ${DB_TYPE}://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=${DB_SSL_MODE}
-      SERVER_ADDRESS: ${SERVER_ADDRESS}
+    ports:
+      - '8888:8888'
+
+volumes:
+  postgres_data:
