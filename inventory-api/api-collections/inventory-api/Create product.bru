@@ -1,0 +1,18 @@
+meta {
+  name: Create product
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8888/product
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "halo",
+    "price": 1213
+  }
+}

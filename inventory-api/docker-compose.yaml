@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest
+    restart: always
+    env_file:
+      - ./.env
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT}:5432"
+  migrate:
+    image: migrate/migrate
+    volumes:
+      - ./db/migrations:/migrations
+    links:
+      - db
+    depends_on:
+      db: 
+        condition: service_healthy
+    env_file:
+      - ./.env
+    command:
+      [
+        '-path',
+        'db/migrations',
+        '-database',
+        '${DB_TYPE}://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable',
+        '-verbose',
+        'up',
+      ]
+  server:
+    build: .
+    restart: always
+    ports:
+      - "8888:8888"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: {DB_TYPE}://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=${DB_SSL_MODE}
+      SERVER_ADDRESS: ${SERVER_ADDRESS}
