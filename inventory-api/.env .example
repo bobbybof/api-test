@@ -1,9 +1,9 @@
 DB_SOURCE=postgresql
 DB_TYPE=postgres
 DB_USERNAME=postgres
-DB_PASSWORD=
-DB_NAME=
-DB_TEST_NAME=
+DB_PASSWORD=passwolh
+DB_NAME=dbname
+DB_TEST_NAME=dbtestname
 DB_HOST=localhost
 DB_PORT=5432
 DB_SSL_MODE=disable
