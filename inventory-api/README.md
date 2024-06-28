@@ -6,7 +6,7 @@
 2. run command `docker compose up`
 3. app running on `http://localhost:8888`
     
-### Developent
+### Development
 #### Prerequisite
 1. Make sure you already installed PostgreSQL in your system, the [Link](https://www.postgresql.org/download/) to Download and the instruction to installing PostgreSQL
 2. Setup `.env` file, you can copy the value from `.env.example` and adjust the value based on your machine
